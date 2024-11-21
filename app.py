@@ -2,9 +2,9 @@ from flask import Flask, request, jsonify
 from kafka import KafkaProducer, KafkaConsumer
 import redis
 import json
-
+from flask_cors import CORS
 app = Flask(__name__)
-
+CORS(app)
 # Cấu hình Redis
 redis_client = redis.StrictRedis(host='localhost', port=6379,password='' ,decode_responses=True)
 
