@@ -73,6 +73,61 @@ def kafka_consumer():
         redis_client.rpush(redis_key, json.dumps(data))
 
 
+@app.route('/streams', methods=['POST'])
+def save_stream():
+    data = request.json
+    stream_key = data.get('streamKey')
+    user_name = data.get('userName')
+    titleLive = data.get('titleLive')
+
+    if not (stream_key and user_name and titleLive):
+        return jsonify({'error': 'Missing required fields: streamKey, userName, or titleLive'}), 400
+
+    # Tạo object lưu trong Redis
+    stream_data = {
+        'userName': user_name,
+        'titleLive': titleLive
+    }
+
+    # Lưu dữ liệu dưới dạng JSON
+    redis_client.set(f"stream:{stream_key}", json.dumps(stream_data))
+
+    return jsonify({'message': 'Stream information saved successfully'}), 200
+
+
+# API GET: Lấy tất cả streamKey cùng thông tin userName và titleLive từ Redis
+@app.route('/streams/getall', methods=['GET'])
+def get_streams():
+    # Lấy tất cả các key có dạng "stream:*"
+    keys = redis_client.keys("stream:*")
+    streams = []
+
+    for key in keys:
+        # Lấy dữ liệu JSON từ Redis và parse về dict
+        stream_data = json.loads(redis_client.get(key))
+        streams.append({
+            'streamKey': key.split("stream:")[1],  # Tách bỏ prefix "stream:"
+            'userName': stream_data['userName'],
+            'titleLive': stream_data['titleLive']
+        })
+
+    return jsonify({'streams': streams}), 200
+
+@app.route('/streams/delete', methods=['POST'])
+def delete_stream():
+    data = request.json
+    stream_key = data.get('streamKey')
+
+    if not stream_key:
+        return jsonify({'error': 'Missing required field: streamKey'}), 400
+
+    # Xóa dữ liệu từ Redis
+    redis_key = f"stream:{stream_key}"
+    if redis_client.exists(redis_key):
+        redis_client.delete(redis_key)
+        return jsonify({'message': f'Stream with key {stream_key} deleted successfully'}), 200
+    else:
+        return jsonify({'error': f'Stream with key {stream_key} does not exist'}), 404
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=15001, debug=True)
