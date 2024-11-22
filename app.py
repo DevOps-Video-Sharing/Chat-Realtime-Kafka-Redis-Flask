@@ -6,17 +6,17 @@ from flask_cors import CORS
 app = Flask(__name__)
 CORS(app)
 # Cấu hình Redis
-redis_client = redis.StrictRedis(host='localhost', port=6379,password='' ,decode_responses=True)
+redis_client = redis.StrictRedis(host='10.40.0.5', port=6379,password='123456' ,decode_responses=True)
 
 # Cấu hình Kafka
 KAFKA_TOPIC = 'chat-messages'
 producer = KafkaProducer(
-    bootstrap_servers='localhost:9092',
+    bootstrap_servers='192.168.2.240:30392',
     value_serializer=lambda v: json.dumps(v).encode('utf-8')
 )
 consumer = KafkaConsumer(
     KAFKA_TOPIC,
-    bootstrap_servers='localhost:9092',
+    bootstrap_servers='192.168.2.240:30392',
     auto_offset_reset='earliest',
     enable_auto_commit=True,
     group_id='chat-group',
