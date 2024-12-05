@@ -11,12 +11,12 @@ redis_client = redis.StrictRedis(host='10.40.0.5', port=6379,password='123456' ,
 # Cấu hình Kafka
 KAFKA_TOPIC = 'chat-messages'
 producer = KafkaProducer(
-    bootstrap_servers='192.168.2.240:30392',
+    bootstrap_servers='192.168.120.131:31182',
     value_serializer=lambda v: json.dumps(v).encode('utf-8')
 )
 consumer = KafkaConsumer(
     KAFKA_TOPIC,
-    bootstrap_servers='192.168.2.240:30392',
+    bootstrap_servers='192.168.120.131:31182',
     auto_offset_reset='earliest',
     enable_auto_commit=True,
     group_id='chat-group',
