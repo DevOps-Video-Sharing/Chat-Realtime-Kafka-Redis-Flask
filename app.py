@@ -131,4 +131,4 @@ def delete_stream():
         return jsonify({'error': f'Stream with key {stream_key} does not exist'}), 404
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=15001, debug=True)
+    app.run(host='192.168.120.213', port=15001, debug=True)
