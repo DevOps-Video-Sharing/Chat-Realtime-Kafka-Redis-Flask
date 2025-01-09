@@ -130,5 +130,27 @@ def delete_stream():
     else:
         return jsonify({'error': f'Stream with key {stream_key} does not exist'}), 404
 
+@app.route('/streams/get/<stream_key>', methods=['GET'])
+def get_stream_by_key(stream_key):
+    # Xây dựng Redis key
+    redis_key = f"stream:{stream_key}"
+    
+    # Kiểm tra xem key có tồn tại trong Redis không
+    if not redis_client.exists(redis_key):
+        return jsonify({'error': 'Stream not found'}), 404
+
+    # Lấy dữ liệu JSON từ Redis và parse về dict
+    stream_data = json.loads(redis_client.get(redis_key))
+
+    # Tạo response
+    response = {
+        'streamKey': stream_key,
+        'titleLive': stream_data.get('titleLive'),
+        'userName': stream_data.get('userName')
+    }
+    
+    return jsonify(response), 200
+
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=15001, debug=True)
